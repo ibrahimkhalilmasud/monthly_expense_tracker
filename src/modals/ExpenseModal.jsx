@@ -96,7 +96,7 @@ export default function ExpenseModal({ isOpen, onClose, editExpense }) {
                   value={form.amount}
                   onChange={(e) => setForm({ ...form, amount: e.target.value })}
                   placeholder="0.00"
-                  className={`${inputClass} pl-12`}
+                  className={`${inputClass} pl-10`}
                   autoFocus
                   required
                 />
