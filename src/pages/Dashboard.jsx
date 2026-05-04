@@ -141,7 +141,7 @@ export default function Dashboard() {
                     tick={{ fontSize: 10 }}
                     stroke="#9ca3af"
                   />
-                  <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickFormatter={(v) => `$${v}`} />
+                  <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickFormatter={(v) => `RM${v}`} />
                   <Tooltip formatter={(value) => [formatCurrency(value), 'Spent']} labelFormatter={(d) => formatShortDate(d)} />
                   <Line type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={2} dot={{ fill: '#6366f1', r: 3 }} />
                 </LineChart>

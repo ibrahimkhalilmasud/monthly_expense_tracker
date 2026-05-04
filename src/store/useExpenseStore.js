@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { storageService } from '../services/storage';
 import { getCurrentMonth } from '../utils/formatters';
+import { SAMPLE_EXPENSES, SAMPLE_BUDGET } from '../utils/sampleData';
 
 let idCounter = Date.now();
 const genId = () => `exp_${++idCounter}_${Math.random().toString(36).slice(2, 8)}`;
@@ -34,6 +35,16 @@ const useExpenseStore = create((set, get) => ({
     const expenses = get().expenses.filter((e) => e.id !== id);
     storageService.saveExpenses(expenses);
     set({ expenses });
+  },
+
+  loadSampleData: () => {
+    const existing = get().expenses;
+    const existingIds = new Set(existing.map((e) => e.id));
+    const newExpenses = SAMPLE_EXPENSES.filter((e) => !existingIds.has(e.id));
+    const merged = [...newExpenses, ...existing];
+    storageService.saveExpenses(merged);
+    storageService.saveBudget(SAMPLE_BUDGET);
+    set({ expenses: merged, budget: SAMPLE_BUDGET });
   },
 
   setBudget: (budget) => {
