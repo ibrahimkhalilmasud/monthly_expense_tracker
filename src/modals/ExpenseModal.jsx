@@ -4,7 +4,7 @@ import useExpenseStore from '../store/useExpenseStore';
 
 const defaultForm = {
   amount: '',
-  category: 'food',
+  category: 'office_rental',
   date: new Date().toISOString().split('T')[0],
   note: '',
 };
@@ -88,7 +88,7 @@ export default function ExpenseModal({ isOpen, onClose, editExpense }) {
                 Amount *
               </label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">RM</span>
                 <input
                   type="number"
                   step="0.01"
@@ -96,7 +96,7 @@ export default function ExpenseModal({ isOpen, onClose, editExpense }) {
                   value={form.amount}
                   onChange={(e) => setForm({ ...form, amount: e.target.value })}
                   placeholder="0.00"
-                  className={`${inputClass} pl-8`}
+                  className={`${inputClass} pl-10`}
                   autoFocus
                   required
                 />

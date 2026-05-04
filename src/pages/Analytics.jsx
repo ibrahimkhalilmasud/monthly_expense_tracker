@@ -78,7 +78,7 @@ export default function Analytics() {
                 <BarChart data={barData} margin={{ top: 0, right: 0, left: -10, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} stroke="#9ca3af" />
-                  <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickFormatter={(v) => `$${v}`} />
+                  <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickFormatter={(v) => `RM${v}`} />
                   <Tooltip formatter={(value) => [formatCurrency(value), 'Spent']} />
                   <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
                     {barData.map((entry, i) => (
@@ -98,7 +98,7 @@ export default function Analytics() {
                 <LineChart data={dailyTrend}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="date" tickFormatter={(d) => formatShortDate(d)} tick={{ fontSize: 10 }} stroke="#9ca3af" />
-                  <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickFormatter={(v) => `$${v}`} />
+                  <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickFormatter={(v) => `RM${v}`} />
                   <Tooltip formatter={(v) => [formatCurrency(v), 'Spent']} labelFormatter={(d) => formatShortDate(d)} />
                   <Line type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={2} dot={{ fill: '#6366f1', r: 3 }} />
                 </LineChart>

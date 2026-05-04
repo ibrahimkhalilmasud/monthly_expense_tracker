@@ -2,6 +2,7 @@ import { useState } from 'react';
 import useExpenseStore from '../store/useExpenseStore';
 import { formatCurrency } from '../utils/formatters';
 import { exportToCSV } from '../utils/csvExport';
+import { SAMPLE_EXPENSES } from '../utils/sampleData';
 
 export default function Settings() {
   const budget = useExpenseStore((s) => s.budget);
@@ -10,9 +11,11 @@ export default function Settings() {
   const updateSettings = useExpenseStore((s) => s.updateSettings);
   const expenses = useExpenseStore((s) => s.expenses);
   const deleteExpense = useExpenseStore((s) => s.deleteExpense);
+  const loadSampleData = useExpenseStore((s) => s.loadSampleData);
 
   const [budgetInput, setBudgetInput] = useState(String(budget));
   const [saved, setSaved] = useState(false);
+  const [sampleLoaded, setSampleLoaded] = useState(false);
 
   const handleSaveBudget = () => {
     const val = Number(budgetInput);
@@ -33,6 +36,20 @@ export default function Settings() {
     }
   };
 
+  const handleLoadSample = () => {
+    const existing = new Set(expenses.map((e) => e.id));
+    const newCount = SAMPLE_EXPENSES.filter((e) => !existing.has(e.id)).length;
+    if (newCount === 0) {
+      alert('Sample data is already loaded.');
+      return;
+    }
+    if (window.confirm(`This will add ${newCount} sample expense records from the Office Expenses data. Continue?`)) {
+      loadSampleData();
+      setSampleLoaded(true);
+      setTimeout(() => setSampleLoaded(false), 3000);
+    }
+  };
+
   const toggleDark = () => {
     updateSettings({ darkMode: !settings.darkMode });
   };
@@ -47,14 +64,14 @@ export default function Settings() {
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Set your spending limit for the month</p>
         <div className="flex gap-3">
           <div className="relative flex-1">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">RM</span>
             <input
               type="number"
               min="1"
               step="50"
               value={budgetInput}
               onChange={(e) => setBudgetInput(e.target.value)}
-              className="w-full pl-8 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             />
           </div>
           <button
@@ -102,6 +119,16 @@ export default function Settings() {
         <h2 className="text-base font-semibold text-gray-800 dark:text-white mb-1">Data Management</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{expenses.length} total expenses</p>
         <div className="space-y-2">
+          <button
+            onClick={handleLoadSample}
+            className={`w-full px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+              sampleLoaded
+                ? 'bg-green-500 text-white'
+                : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100'
+            }`}
+          >
+            {sampleLoaded ? '✓ Sample Data Loaded!' : '📊 Load Sample Data (Office Expenses)'}
+          </button>
           <button
             onClick={handleExportCSV}
             disabled={expenses.length === 0}
