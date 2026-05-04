@@ -6,13 +6,26 @@ import { SAMPLE_EXPENSES, SAMPLE_BUDGET } from '../utils/sampleData';
 let idCounter = Date.now();
 const genId = () => `exp_${++idCounter}_${Math.random().toString(36).slice(2, 8)}`;
 
+// Auto-load sample data on first visit (empty localStorage)
+function initExpenses() {
+  const stored = storageService.getExpenses();
+  if (stored.length === 0) {
+    storageService.saveExpenses(SAMPLE_EXPENSES);
+    storageService.saveBudget(SAMPLE_BUDGET);
+    return SAMPLE_EXPENSES;
+  }
+  return stored;
+}
+
 const useExpenseStore = create((set, get) => ({
-  expenses: storageService.getExpenses(),
+  expenses: initExpenses(),
   budget: storageService.getBudget(),
   settings: storageService.getSettings(),
   selectedMonth: getCurrentMonth(),
+  selectedYear: String(new Date().getFullYear()),
 
   setSelectedMonth: (month) => set({ selectedMonth: month }),
+  setSelectedYear: (year) => set({ selectedYear: year }),
 
   addExpense: (data) => {
     const expense = {
@@ -86,6 +99,48 @@ const useExpenseStore = create((set, get) => ({
     return Object.entries(daily)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, amount]) => ({ date, amount }));
+  },
+
+  // ── Yearly helpers ──────────────────────────────────────────────────────────
+
+  getAvailableYears: () => {
+    const { expenses } = get();
+    const years = new Set(
+      expenses.map((e) => e.date?.split('-')[0]).filter(Boolean)
+    );
+    return [...years].sort().reverse();
+  },
+
+  getYearlyMonthlyData: (year) => {
+    const { expenses } = get();
+    const yearExpenses = expenses.filter((e) => e.date?.startsWith(year));
+    const monthly = {};
+    for (let m = 1; m <= 12; m++) {
+      const key = `${year}-${String(m).padStart(2, '0')}`;
+      monthly[key] = 0;
+    }
+    yearExpenses.forEach((e) => {
+      const month = e.date.substring(0, 7);
+      if (month in monthly) monthly[month] += Number(e.amount);
+    });
+    return Object.entries(monthly).map(([month, amount]) => ({ month, amount }));
+  },
+
+  getYearlyCategoryBreakdown: (year) => {
+    const { expenses } = get();
+    const yearExpenses = expenses.filter((e) => e.date?.startsWith(year));
+    const breakdown = {};
+    yearExpenses.forEach((e) => {
+      breakdown[e.category] = (breakdown[e.category] || 0) + Number(e.amount);
+    });
+    return breakdown;
+  },
+
+  getYearlyTotal: (year) => {
+    const { expenses } = get();
+    return expenses
+      .filter((e) => e.date?.startsWith(year))
+      .reduce((sum, e) => sum + Number(e.amount), 0);
   },
 }));
 
