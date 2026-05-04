@@ -1,24 +1,11 @@
-import { lazy, Suspense } from 'react';
 import useExpenseStore from '../store/useExpenseStore';
 import { CATEGORIES } from '../utils/categories';
 import { formatCurrency, formatShortDate, getMonthLabel } from '../utils/formatters';
-
-const BarChart = lazy(() => import('recharts').then((m) => ({ default: m.BarChart })));
-const Bar = lazy(() => import('recharts').then((m) => ({ default: m.Bar })));
-const XAxis = lazy(() => import('recharts').then((m) => ({ default: m.XAxis })));
-const YAxis = lazy(() => import('recharts').then((m) => ({ default: m.YAxis })));
-const CartesianGrid = lazy(() => import('recharts').then((m) => ({ default: m.CartesianGrid })));
-const Tooltip = lazy(() => import('recharts').then((m) => ({ default: m.Tooltip })));
-const ResponsiveContainer = lazy(() => import('recharts').then((m) => ({ default: m.ResponsiveContainer })));
-const PieChart = lazy(() => import('recharts').then((m) => ({ default: m.PieChart })));
-const Pie = lazy(() => import('recharts').then((m) => ({ default: m.Pie })));
-const Cell = lazy(() => import('recharts').then((m) => ({ default: m.Cell })));
-const LineChart = lazy(() => import('recharts').then((m) => ({ default: m.LineChart })));
-const Line = lazy(() => import('recharts').then((m) => ({ default: m.Line })));
-
-function ChartLoading() {
-  return <div className="flex items-center justify-center h-48 text-gray-400">Loading chart...</div>;
-}
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell,
+  LineChart, Line,
+} from 'recharts';
 
 export default function Analytics() {
   const selectedMonth = useExpenseStore((s) => s.selectedMonth);
@@ -73,66 +60,60 @@ export default function Analytics() {
           {/* Bar Chart */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
             <h2 className="text-base font-semibold text-gray-800 dark:text-white mb-3">Spending by Category</h2>
-            <Suspense fallback={<ChartLoading />}>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={barData} margin={{ top: 0, right: 0, left: -10, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="name" tick={{ fontSize: 10 }} stroke="#9ca3af" />
-                  <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickFormatter={(v) => `RM${v}`} />
-                  <Tooltip formatter={(value) => [formatCurrency(value), 'Spent']} />
-                  <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
-                    {barData.map((entry, i) => (
-                      <Cell key={i} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </Suspense>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={barData} margin={{ top: 0, right: 0, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="name" tick={{ fontSize: 10 }} stroke="#9ca3af" />
+                <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickFormatter={(v) => `RM${v}`} />
+                <Tooltip formatter={(value) => [formatCurrency(value), 'Spent']} />
+                <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
+                  {barData.map((entry, i) => (
+                    <Cell key={i} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
 
           {/* Daily trend */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
             <h2 className="text-base font-semibold text-gray-800 dark:text-white mb-3">Daily Spending Trend</h2>
-            <Suspense fallback={<ChartLoading />}>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={dailyTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="date" tickFormatter={(d) => formatShortDate(d)} tick={{ fontSize: 10 }} stroke="#9ca3af" />
-                  <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickFormatter={(v) => `RM${v}`} />
-                  <Tooltip formatter={(v) => [formatCurrency(v), 'Spent']} labelFormatter={(d) => formatShortDate(d)} />
-                  <Line type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={2} dot={{ fill: '#6366f1', r: 3 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </Suspense>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={dailyTrend}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="date" tickFormatter={(d) => formatShortDate(d)} tick={{ fontSize: 10 }} stroke="#9ca3af" />
+                <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickFormatter={(v) => `RM${v}`} />
+                <Tooltip formatter={(v) => [formatCurrency(v), 'Spent']} labelFormatter={(d) => formatShortDate(d)} />
+                <Line type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={2} dot={{ fill: '#6366f1', r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
 
           {/* Category distribution */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
             <h2 className="text-base font-semibold text-gray-800 dark:text-white mb-3">Distribution</h2>
-            <Suspense fallback={<ChartLoading />}>
-              <div className="flex flex-col md:flex-row items-center gap-4">
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie data={pieData} dataKey="value" cx="50%" cy="50%" outerRadius={80}>
-                      {pieData.map((entry, i) => (
-                        <Cell key={i} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(v) => formatCurrency(v)} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="w-full space-y-2">
-                  {barData.map((d) => (
-                    <div key={d.name} className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: d.color }} />
-                      <span className="text-xs text-gray-600 dark:text-gray-400 flex-1">{d.name}</span>
-                      <span className="text-xs font-semibold text-gray-900 dark:text-white">{formatCurrency(d.amount)}</span>
-                      <span className="text-xs text-gray-400">({total > 0 ? Math.round((d.amount / total) * 100) : 0}%)</span>
-                    </div>
-                  ))}
-                </div>
+            <div className="flex flex-col md:flex-row items-center gap-4">
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie data={pieData} dataKey="value" cx="50%" cy="50%" outerRadius={80}>
+                    {pieData.map((entry, i) => (
+                      <Cell key={i} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(v) => formatCurrency(v)} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="w-full space-y-2">
+                {barData.map((d) => (
+                  <div key={d.name} className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: d.color }} />
+                    <span className="text-xs text-gray-600 dark:text-gray-400 flex-1">{d.name}</span>
+                    <span className="text-xs font-semibold text-gray-900 dark:text-white">{formatCurrency(d.amount)}</span>
+                    <span className="text-xs text-gray-400">({total > 0 ? Math.round((d.amount / total) * 100) : 0}%)</span>
+                  </div>
+                ))}
               </div>
-            </Suspense>
+            </div>
           </div>
         </div>
       )}
