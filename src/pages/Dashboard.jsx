@@ -1,25 +1,14 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState } from 'react';
 import useExpenseStore from '../store/useExpenseStore';
 import StatCard from '../components/ui/StatCard';
 import BudgetProgress from '../components/ui/BudgetProgress';
 import { formatCurrency, formatShortDate, getMonthLabel } from '../utils/formatters';
 import { CATEGORIES, getCategoryById } from '../utils/categories';
 import ExpenseModal from '../modals/ExpenseModal';
-
-const PieChart = lazy(() => import('recharts').then((m) => ({ default: m.PieChart })));
-const Pie = lazy(() => import('recharts').then((m) => ({ default: m.Pie })));
-const Cell = lazy(() => import('recharts').then((m) => ({ default: m.Cell })));
-const Tooltip = lazy(() => import('recharts').then((m) => ({ default: m.Tooltip })));
-const ResponsiveContainer = lazy(() => import('recharts').then((m) => ({ default: m.ResponsiveContainer })));
-const LineChart = lazy(() => import('recharts').then((m) => ({ default: m.LineChart })));
-const Line = lazy(() => import('recharts').then((m) => ({ default: m.Line })));
-const XAxis = lazy(() => import('recharts').then((m) => ({ default: m.XAxis })));
-const YAxis = lazy(() => import('recharts').then((m) => ({ default: m.YAxis })));
-const CartesianGrid = lazy(() => import('recharts').then((m) => ({ default: m.CartesianGrid })));
-
-function ChartLoading() {
-  return <div className="flex items-center justify-center h-48 text-gray-400">Loading chart...</div>;
-}
+import {
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
+  LineChart, Line, XAxis, YAxis, CartesianGrid,
+} from 'recharts';
 
 export default function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -101,7 +90,7 @@ export default function Dashboard() {
           {pieData.length === 0 ? (
             <div className="flex items-center justify-center h-48 text-gray-400 text-sm">No expenses this month</div>
           ) : (
-            <Suspense fallback={<ChartLoading />}>
+            <>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
                   <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}>
@@ -121,7 +110,7 @@ export default function Dashboard() {
                   </div>
                 ))}
               </div>
-            </Suspense>
+            </>
           )}
         </div>
 
@@ -131,22 +120,20 @@ export default function Dashboard() {
           {dailyTrend.length === 0 ? (
             <div className="flex items-center justify-center h-48 text-gray-400 text-sm">No expenses this month</div>
           ) : (
-            <Suspense fallback={<ChartLoading />}>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={dailyTrend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis
-                    dataKey="date"
-                    tickFormatter={(d) => formatShortDate(d)}
-                    tick={{ fontSize: 10 }}
-                    stroke="#9ca3af"
-                  />
-                  <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickFormatter={(v) => `RM${v}`} />
-                  <Tooltip formatter={(value) => [formatCurrency(value), 'Spent']} labelFormatter={(d) => formatShortDate(d)} />
-                  <Line type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={2} dot={{ fill: '#6366f1', r: 3 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </Suspense>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={dailyTrend}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis
+                  dataKey="date"
+                  tickFormatter={(d) => formatShortDate(d)}
+                  tick={{ fontSize: 10 }}
+                  stroke="#9ca3af"
+                />
+                <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickFormatter={(v) => `RM${v}`} />
+                <Tooltip formatter={(value) => [formatCurrency(value), 'Spent']} labelFormatter={(d) => formatShortDate(d)} />
+                <Line type="monotone" dataKey="amount" stroke="#6366f1" strokeWidth={2} dot={{ fill: '#6366f1', r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
           )}
         </div>
       </div>
