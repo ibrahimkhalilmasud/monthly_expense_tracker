@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import AppLayout from './components/layout/AppLayout'
 import Dashboard from './pages/Dashboard'
@@ -10,7 +10,7 @@ import Settings from './pages/Settings'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<AppLayout />}>
           <Route index element={<Dashboard />} />
@@ -19,6 +19,6 @@ createRoot(document.getElementById('root')).render(
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   </StrictMode>,
 )
