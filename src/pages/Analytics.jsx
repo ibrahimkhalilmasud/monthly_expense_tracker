@@ -5,7 +5,7 @@ import { formatCurrency, formatShortDate, getMonthLabel, getMonthShortLabel } fr
 import MonthPicker from '../components/ui/MonthPicker';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell,
+  PieChart, Pie,
   LineChart, Line,
 } from 'recharts';
 
@@ -35,7 +35,7 @@ export default function Analytics() {
   const mAvg = monthly.length > 0 ? mTotal / monthly.length : 0;
   const mMax = monthly.length > 0 ? Math.max(...monthly.map((e) => Number(e.amount))) : 0;
   const mBarData = CATEGORIES.filter((c) => breakdown[c.id])
-    .map((c) => ({ name: c.label, amount: breakdown[c.id], color: c.color }));
+    .map((c) => ({ name: c.label, amount: breakdown[c.id], color: c.color, fill: c.color }));
   const mPieData = mBarData.map((d) => ({ ...d, value: d.amount }));
 
   // Scale factor: each month's bar width is proportional to its share * this
@@ -49,7 +49,7 @@ export default function Analytics() {
   const yCatBreakdown = getYearlyCategoryBreakdown(selectedYear);
   const yTotal = getYearlyTotal(selectedYear);
   const yCatData = CATEGORIES.filter((c) => yCatBreakdown[c.id])
-    .map((c) => ({ name: c.label, amount: yCatBreakdown[c.id], color: c.color, value: yCatBreakdown[c.id] }));
+    .map((c) => ({ name: c.label, amount: yCatBreakdown[c.id], color: c.color, value: yCatBreakdown[c.id], fill: c.color }));
   const yTransactions = useExpenseStore((s) =>
     s.expenses.filter((e) => e.date?.startsWith(selectedYear))
   );
@@ -128,9 +128,7 @@ export default function Analytics() {
                     <XAxis dataKey="name" tick={{ fontSize: 10 }} stroke="#9ca3af" />
                     <YAxis tick={{ fontSize: 10 }} stroke="#9ca3af" tickFormatter={(v) => `RM${v}`} />
                     <Tooltip formatter={(value) => [formatCurrency(value), 'Spent']} />
-                    <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
-                      {mBarData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                    </Bar>
+                    <Bar dataKey="amount" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -155,9 +153,7 @@ export default function Analytics() {
                 <div className="flex flex-col md:flex-row items-center gap-4">
                   <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
-                      <Pie data={mPieData} dataKey="value" cx="50%" cy="50%" outerRadius={80}>
-                        {mPieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                      </Pie>
+                      <Pie data={mPieData} dataKey="value" cx="50%" cy="50%" outerRadius={80} />
                       <Tooltip formatter={(v) => formatCurrency(v)} />
                     </PieChart>
                   </ResponsiveContainer>
@@ -280,9 +276,7 @@ export default function Analytics() {
                   <div className="flex flex-col md:flex-row items-center gap-4">
                     <ResponsiveContainer width="100%" height={200}>
                       <PieChart>
-                        <Pie data={yCatData} dataKey="value" cx="50%" cy="50%" outerRadius={80}>
-                          {yCatData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                        </Pie>
+                        <Pie data={yCatData} dataKey="value" cx="50%" cy="50%" outerRadius={80} />
                         <Tooltip formatter={(v) => formatCurrency(v)} />
                       </PieChart>
                     </ResponsiveContainer>

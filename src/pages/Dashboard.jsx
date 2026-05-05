@@ -7,7 +7,7 @@ import { formatCurrency, formatShortDate, getMonthLabel } from '../utils/formatt
 import { CATEGORIES, getCategoryById } from '../utils/categories';
 import ExpenseModal from '../modals/ExpenseModal';
 import {
-  PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Tooltip, ResponsiveContainer,
   LineChart, Line, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
 
@@ -28,7 +28,7 @@ export default function Dashboard() {
 
   const pieData = CATEGORIES
     .filter((c) => breakdown[c.id])
-    .map((c) => ({ name: c.label, value: breakdown[c.id], color: c.color, id: c.id }));
+    .map((c) => ({ name: c.label, value: breakdown[c.id], color: c.color, id: c.id, fill: c.color }));
 
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
@@ -98,11 +98,7 @@ export default function Dashboard() {
             <>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
-                  <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}>
-                    {pieData.map((entry) => (
-                      <Cell key={entry.id} fill={entry.color} />
-                    ))}
-                  </Pie>
+                  <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} />
                   <Tooltip formatter={(value) => formatCurrency(value)} />
                 </PieChart>
               </ResponsiveContainer>
