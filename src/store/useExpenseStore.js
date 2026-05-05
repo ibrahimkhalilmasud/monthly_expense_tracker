@@ -3,6 +3,8 @@ import { storageService } from '../services/storage';
 import { getCurrentMonth } from '../utils/formatters';
 import { SAMPLE_EXPENSES, SAMPLE_BUDGET } from '../utils/sampleData';
 
+const YEAR_MONTH_LENGTH = 7;
+
 let idCounter = Date.now();
 const genId = () => `exp_${++idCounter}_${Math.random().toString(36).slice(2, 8)}`;
 
@@ -31,7 +33,7 @@ const initialExpenses = initExpenses();
 const currentMonth = getCurrentMonth();
 const currentYear = String(new Date().getFullYear());
 const availableMonths = [
-  ...new Set(initialExpenses.map((e) => e.date?.substring(0, 7)).filter(Boolean)),
+  ...new Set(initialExpenses.map((e) => e.date?.substring(0, YEAR_MONTH_LENGTH)).filter(Boolean)),
 ].sort();
 const availableYears = [
   ...new Set(initialExpenses.map((e) => e.date?.split('-')[0]).filter(Boolean)),
