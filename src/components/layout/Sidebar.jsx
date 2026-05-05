@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import MonthPicker from '../ui/MonthPicker';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: '📊' },
@@ -33,7 +34,14 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
-      <div className="p-4 text-xs text-gray-400 dark:text-gray-600 border-t border-gray-200 dark:border-gray-700">
+      {/* Month selector in sidebar */}
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
+        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+          Selected Month
+        </p>
+        <MonthPicker className="w-full" />
+      </div>
+      <div className="px-4 pb-4 text-xs text-gray-400 dark:text-gray-600">
         Monthly Expense Tracker v1.0
       </div>
     </aside>

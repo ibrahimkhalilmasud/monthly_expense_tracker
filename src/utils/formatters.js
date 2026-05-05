@@ -16,3 +16,8 @@ export const getMonthLabel = (monthStr) => {
   const [year, month] = monthStr.split('-');
   return new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 };
+
+export const getMonthShortLabel = (monthStr) => {
+  const [year, month] = monthStr.split('-');
+  return new Date(year, month - 1).toLocaleDateString('en-US', { month: 'short' });
+};

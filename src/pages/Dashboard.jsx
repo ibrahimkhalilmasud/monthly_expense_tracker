@@ -2,6 +2,7 @@ import { useState } from 'react';
 import useExpenseStore from '../store/useExpenseStore';
 import StatCard from '../components/ui/StatCard';
 import BudgetProgress from '../components/ui/BudgetProgress';
+import MonthPicker from '../components/ui/MonthPicker';
 import { formatCurrency, formatShortDate, getMonthLabel } from '../utils/formatters';
 import { CATEGORIES, getCategoryById } from '../utils/categories';
 import ExpenseModal from '../modals/ExpenseModal';
@@ -32,17 +33,21 @@ export default function Dashboard() {
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{getMonthLabel(selectedMonth)}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 hidden lg:block">{getMonthLabel(selectedMonth)}</p>
         </div>
-        <button
-          onClick={() => setModalOpen(true)}
-          className="hidden lg:flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-medium transition-colors"
-        >
-          + Add Expense
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Month picker shown on mobile (sidebar has it on desktop) */}
+          <MonthPicker className="lg:hidden" />
+          <button
+            onClick={() => setModalOpen(true)}
+            className="hidden lg:flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-medium transition-colors"
+          >
+            + Add Expense
+          </button>
+        </div>
       </div>
 
       {/* Stats grid */}
@@ -151,10 +156,19 @@ export default function Dashboard() {
                     <span className="text-xl">{cat.icon}</span>
                     <div>
                       <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{cat.label}</p>
+                      {e.vendor && <p className="text-xs text-indigo-500 dark:text-indigo-400">{e.vendor}</p>}
                       <p className="text-xs text-gray-400">{formatShortDate(e.date)}</p>
                     </div>
                   </div>
-                  <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(e.amount)}</span>
+                  <div className="flex items-center gap-2">
+                    {(e.billCopy || e.paymentCopy) && (
+                      <div className="flex gap-1">
+                        {e.billCopy && <span title="Bill copy attached" className="text-xs">📄</span>}
+                        {e.paymentCopy && <span title="Payment copy attached" className="text-xs">✅</span>}
+                      </div>
+                    )}
+                    <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(e.amount)}</span>
+                  </div>
                 </div>
               );
             })}
@@ -170,7 +184,7 @@ export default function Dashboard() {
         +
       </button>
 
-      <ExpenseModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      <ExpenseModal key={modalOpen ? 'open' : 'closed'} isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 }

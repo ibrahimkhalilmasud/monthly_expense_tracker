@@ -17,10 +17,12 @@ export default function Expenses() {
 
   const filtered = expenses.filter((e) => {
     const cat = getCategoryById(e.category);
+    const q = search.toLowerCase();
     const matchSearch =
-      !search ||
-      cat.label.toLowerCase().includes(search.toLowerCase()) ||
-      (e.note && e.note.toLowerCase().includes(search.toLowerCase()));
+      !q ||
+      cat.label.toLowerCase().includes(q) ||
+      (e.note && e.note.toLowerCase().includes(q)) ||
+      (e.vendor && e.vendor.toLowerCase().includes(q));
     const matchCategory = filterCategory === 'all' || e.category === filterCategory;
     return matchSearch && matchCategory;
   });
@@ -41,7 +43,10 @@ export default function Expenses() {
     <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Expenses</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Expenses</h1>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{filtered.length} of {expenses.length} records</p>
+        </div>
         <button
           onClick={() => setModalOpen(true)}
           className="hidden lg:flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-medium transition-colors"
@@ -54,7 +59,7 @@ export default function Expenses() {
       <div className="flex gap-3 mb-4">
         <input
           type="text"
-          placeholder="Search expenses..."
+          placeholder="Search category, vendor or notes…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -64,10 +69,10 @@ export default function Expenses() {
           onChange={(e) => setFilterCategory(e.target.value)}
           className="px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
-          <option value="all">All</option>
+          <option value="all">All Categories</option>
           {uniqueCategories.map((c) => {
             const cat = getCategoryById(c);
-            return <option key={c} value={c}>{cat.label}</option>;
+            return <option key={c} value={c}>{cat.icon} {cat.label}</option>;
           })}
         </select>
       </div>
@@ -95,30 +100,70 @@ export default function Expenses() {
       <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-100 dark:border-gray-700">
-              <th className="text-left px-6 py-4 text-gray-500 dark:text-gray-400 font-medium">Date</th>
-              <th className="text-left px-6 py-4 text-gray-500 dark:text-gray-400 font-medium">Category</th>
-              <th className="text-left px-6 py-4 text-gray-500 dark:text-gray-400 font-medium">Amount</th>
-              <th className="text-left px-6 py-4 text-gray-500 dark:text-gray-400 font-medium">Notes</th>
-              <th className="text-left px-6 py-4 text-gray-500 dark:text-gray-400 font-medium">Actions</th>
+            <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+              <th className="text-left px-5 py-3.5 text-gray-500 dark:text-gray-400 font-medium">Date</th>
+              <th className="text-left px-5 py-3.5 text-gray-500 dark:text-gray-400 font-medium">Category</th>
+              <th className="text-left px-5 py-3.5 text-gray-500 dark:text-gray-400 font-medium">Vendor</th>
+              <th className="text-left px-5 py-3.5 text-gray-500 dark:text-gray-400 font-medium">Amount</th>
+              <th className="text-left px-5 py-3.5 text-gray-500 dark:text-gray-400 font-medium">Notes</th>
+              <th className="text-left px-5 py-3.5 text-gray-500 dark:text-gray-400 font-medium">Files</th>
+              <th className="text-left px-5 py-3.5 text-gray-500 dark:text-gray-400 font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={5} className="text-center py-16 text-gray-400">
+                <td colSpan={7} className="text-center py-16 text-gray-400">
                   No expenses found
                 </td>
               </tr>
             ) : (
               filtered.map((e) => (
                 <tr key={e.id} className="border-b border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                  <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{formatDate(e.date)}</td>
-                  <td className="px-6 py-4"><CategoryBadge categoryId={e.category} /></td>
-                  <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">{formatCurrency(e.amount)}</td>
-                  <td className="px-6 py-4 text-gray-500 dark:text-gray-400 max-w-xs truncate">{e.note || '-'}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
+                  <td className="px-5 py-3.5 text-gray-600 dark:text-gray-400 whitespace-nowrap">{formatDate(e.date)}</td>
+                  <td className="px-5 py-3.5"><CategoryBadge categoryId={e.category} /></td>
+                  <td className="px-5 py-3.5 text-gray-700 dark:text-gray-300 max-w-[140px] truncate">
+                    {e.vendor || <span className="text-gray-300 dark:text-gray-600">—</span>}
+                  </td>
+                  <td className="px-5 py-3.5 font-semibold text-gray-900 dark:text-white whitespace-nowrap">{formatCurrency(e.amount)}</td>
+                  <td className="px-5 py-3.5 text-gray-500 dark:text-gray-400 max-w-[180px] truncate">
+                    {e.note || <span className="text-gray-300 dark:text-gray-600">—</span>}
+                  </td>
+                  {/* Attachment indicators + click-to-view */}
+                  <td className="px-5 py-3.5">
+                    <div className="flex items-center gap-1.5">
+                      {e.billCopy ? (
+                        <a
+                          href={e.billCopy}
+                          download={e.billCopyName || 'bill.jpg'}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="View bill copy"
+                          className="text-base hover:scale-110 transition-transform"
+                        >
+                          📄
+                        </a>
+                      ) : (
+                        <span className="text-gray-300 dark:text-gray-700 text-base" aria-label="No bill copy attached">–</span>
+                      )}
+                      {e.paymentCopy ? (
+                        <a
+                          href={e.paymentCopy}
+                          download={e.paymentCopyName || 'payment.jpg'}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="View payment copy"
+                          className="text-base hover:scale-110 transition-transform"
+                        >
+                          ✅
+                        </a>
+                      ) : (
+                        <span className="text-gray-300 dark:text-gray-700 text-base" aria-label="No payment copy attached">–</span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <div className="flex items-center gap-3">
                       <button
                         onClick={() => handleEdit(e)}
                         className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 text-xs font-medium"
@@ -148,7 +193,7 @@ export default function Expenses() {
         +
       </button>
 
-      <ExpenseModal isOpen={modalOpen} onClose={handleCloseModal} editExpense={editExpense} />
+      <ExpenseModal key={editExpense?.id || (modalOpen ? 'new' : 'closed')} isOpen={modalOpen} onClose={handleCloseModal} editExpense={editExpense} />
     </div>
   );
 }
