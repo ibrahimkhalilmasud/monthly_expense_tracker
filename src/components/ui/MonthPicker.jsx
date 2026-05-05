@@ -1,5 +1,5 @@
 import useExpenseStore from '../../store/useExpenseStore';
-import { getMonthLabel } from '../../utils/formatters';
+import { getCurrentMonth, getMonthLabel } from '../../utils/formatters';
 
 /**
  * A compact month-picker dropdown.
@@ -13,7 +13,8 @@ export default function MonthPicker({ className = '' }) {
 
   // Collect all months from expense data
   const monthSet = new Set(expenses.map((e) => e.date?.substring(0, 7)).filter(Boolean));
-  // Always include the currently selected month (in case there's no data for it)
+  // Always include the current month and the selected month (in case there's no data for them)
+  monthSet.add(getCurrentMonth());
   monthSet.add(selectedMonth);
 
   const months = [...monthSet].sort().reverse();

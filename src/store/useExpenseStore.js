@@ -27,12 +27,26 @@ function initExpenses() {
   return stored;
 }
 
+const initialExpenses = initExpenses();
+const currentMonth = getCurrentMonth();
+const currentYear = String(new Date().getFullYear());
+const availableMonths = [
+  ...new Set(initialExpenses.map((e) => e.date?.substring(0, 7)).filter(Boolean)),
+].sort();
+const availableYears = [
+  ...new Set(initialExpenses.map((e) => e.date?.split('-')[0]).filter(Boolean)),
+].sort();
+const latestMonth = availableMonths[availableMonths.length - 1];
+const latestYear = availableYears[availableYears.length - 1];
+const initialMonth = availableMonths.includes(currentMonth) ? currentMonth : (latestMonth || currentMonth);
+const initialYear = availableYears.includes(currentYear) ? currentYear : (latestYear || currentYear);
+
 const useExpenseStore = create((set, get) => ({
-  expenses: initExpenses(),
+  expenses: initialExpenses,
   budget: storageService.getBudget(),
   settings: storageService.getSettings(),
-  selectedMonth: getCurrentMonth(),
-  selectedYear: String(new Date().getFullYear()),
+  selectedMonth: initialMonth,
+  selectedYear: initialYear,
 
   setSelectedMonth: (month) => set({ selectedMonth: month }),
   setSelectedYear: (year) => set({ selectedYear: year }),
