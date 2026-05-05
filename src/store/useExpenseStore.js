@@ -36,8 +36,12 @@ const availableMonths = [
 const availableYears = [
   ...new Set(initialExpenses.map((e) => e.date?.split('-')[0]).filter(Boolean)),
 ].sort();
-const latestMonth = availableMonths[availableMonths.length - 1];
-const latestYear = availableYears[availableYears.length - 1];
+const monthsUpToCurrent = availableMonths.filter((month) => month <= currentMonth);
+const yearsUpToCurrent = availableYears.filter((year) => year <= currentYear);
+const monthFallback = monthsUpToCurrent.length > 0 ? monthsUpToCurrent : availableMonths;
+const yearFallback = yearsUpToCurrent.length > 0 ? yearsUpToCurrent : availableYears;
+const latestMonth = monthFallback[monthFallback.length - 1];
+const latestYear = yearFallback[yearFallback.length - 1];
 const initialMonth = availableMonths.includes(currentMonth) ? currentMonth : (latestMonth || currentMonth);
 const initialYear = availableYears.includes(currentYear) ? currentYear : (latestYear || currentYear);
 
