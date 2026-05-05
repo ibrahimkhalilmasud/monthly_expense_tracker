@@ -38,10 +38,10 @@ const availableYears = [
 ].sort();
 const monthsUpToCurrent = availableMonths.filter((month) => month <= currentMonth);
 const yearsUpToCurrent = availableYears.filter((year) => year <= currentYear);
-const latestMonth = monthsUpToCurrent[monthsUpToCurrent.length - 1];
-const latestYear = yearsUpToCurrent[yearsUpToCurrent.length - 1];
-const initialMonth = availableMonths.includes(currentMonth) ? currentMonth : (latestMonth || currentMonth);
-const initialYear = availableYears.includes(currentYear) ? currentYear : (latestYear || currentYear);
+const latestPastMonth = monthsUpToCurrent[monthsUpToCurrent.length - 1];
+const latestPastYear = yearsUpToCurrent[yearsUpToCurrent.length - 1];
+const initialMonth = availableMonths.includes(currentMonth) ? currentMonth : (latestPastMonth || currentMonth);
+const initialYear = availableYears.includes(currentYear) ? currentYear : (latestPastYear || currentYear);
 
 const useExpenseStore = create((set, get) => ({
   expenses: initialExpenses,
