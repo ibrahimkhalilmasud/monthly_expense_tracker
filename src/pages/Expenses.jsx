@@ -6,6 +6,8 @@ import { formatCurrency, formatDate } from '../utils/formatters';
 import { getCategoryById } from '../utils/categories';
 import ExpenseModal from '../modals/ExpenseModal';
 
+const CURRENT_YEAR = String(new Date().getFullYear());
+
 export default function Expenses() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editExpense, setEditExpense] = useState(null);
@@ -23,9 +25,21 @@ export default function Expenses() {
       cat.label.toLowerCase().includes(q) ||
       (e.note && e.note.toLowerCase().includes(q)) ||
       (e.vendor && e.vendor.toLowerCase().includes(q));
-    const matchCategory = filterCategory === 'all' || e.category === filterCategory;
+
+    let matchCategory;
+    if (filterCategory === 'all' || filterCategory === 'total') {
+      matchCategory = true;
+    } else if (filterCategory === 'yearly') {
+      matchCategory = e.date?.startsWith(CURRENT_YEAR);
+    } else {
+      matchCategory = e.category === filterCategory;
+    }
+
     return matchSearch && matchCategory;
   });
+
+  const filteredTotal = filtered.reduce((sum, e) => sum + Number(e.amount), 0);
+  const showTotal = filterCategory === 'total' || filterCategory === 'yearly';
 
   const handleEdit = (expense) => {
     setEditExpense(expense);
@@ -70,12 +84,25 @@ export default function Expenses() {
           className="px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           <option value="all">All Categories</option>
+          <option value="total">💰 Total (All Time)</option>
+          <option value="yearly">📆 Yearly ({CURRENT_YEAR})</option>
           {uniqueCategories.map((c) => {
             const cat = getCategoryById(c);
             return <option key={c} value={c}>{cat.icon} {cat.label}</option>;
           })}
         </select>
       </div>
+
+      {/* Total summary bar */}
+      {showTotal && filtered.length > 0 && (
+        <div className="flex items-center justify-between bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-xl px-4 py-2.5 mb-4">
+          <span className="text-sm text-indigo-700 dark:text-indigo-300 font-medium">
+            {filterCategory === 'yearly' ? `${CURRENT_YEAR} Total` : 'Grand Total'}{' '}
+            <span className="text-xs font-normal text-indigo-500 dark:text-indigo-400">({filtered.length} records)</span>
+          </span>
+          <span className="text-base font-bold text-indigo-700 dark:text-indigo-300">{formatCurrency(filteredTotal)}</span>
+        </div>
+      )}
 
       {/* Mobile list */}
       <div className="lg:hidden">

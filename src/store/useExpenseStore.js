@@ -6,13 +6,23 @@ import { SAMPLE_EXPENSES, SAMPLE_BUDGET } from '../utils/sampleData';
 let idCounter = Date.now();
 const genId = () => `exp_${++idCounter}_${Math.random().toString(36).slice(2, 8)}`;
 
-// Auto-load sample data on first visit (empty localStorage)
+// Auto-load sample data on first visit (empty localStorage).
+// On subsequent visits, auto-merge any new sample items that are not yet stored.
 function initExpenses() {
   const stored = storageService.getExpenses();
   if (stored.length === 0) {
     storageService.saveExpenses(SAMPLE_EXPENSES);
     storageService.saveBudget(SAMPLE_BUDGET);
     return SAMPLE_EXPENSES;
+  }
+  // Merge new sample items (identified by id) into existing data so that
+  // users automatically see newly-added sample entries on reload.
+  const storedIds = new Set(stored.map((e) => e.id));
+  const newItems = SAMPLE_EXPENSES.filter((e) => !storedIds.has(e.id));
+  if (newItems.length > 0) {
+    const merged = [...stored, ...newItems];
+    storageService.saveExpenses(merged);
+    return merged;
   }
   return stored;
 }
