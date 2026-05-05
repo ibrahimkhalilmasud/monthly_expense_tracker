@@ -1,6 +1,8 @@
 export const formatCurrency = (amount, currency = 'MYR') =>
   new Intl.NumberFormat('en-MY', { style: 'currency', currency }).format(amount);
 
+export const YEAR_MONTH_LENGTH = 7;
+
 export const formatDate = (dateStr) =>
   new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 

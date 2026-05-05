@@ -1,9 +1,7 @@
 import { create } from 'zustand';
 import { storageService } from '../services/storage';
-import { getCurrentMonth } from '../utils/formatters';
+import { getCurrentMonth, YEAR_MONTH_LENGTH } from '../utils/formatters';
 import { SAMPLE_EXPENSES, SAMPLE_BUDGET } from '../utils/sampleData';
-
-const YEAR_MONTH_LENGTH = 7;
 
 let idCounter = Date.now();
 const genId = () => `exp_${++idCounter}_${Math.random().toString(36).slice(2, 8)}`;
@@ -40,10 +38,18 @@ const availableYears = [
 ].sort();
 const monthsUpToCurrent = availableMonths.filter((month) => month <= currentMonth);
 const yearsUpToCurrent = availableYears.filter((year) => year <= currentYear);
-const latestPastMonth = monthsUpToCurrent[monthsUpToCurrent.length - 1];
-const latestPastYear = yearsUpToCurrent[yearsUpToCurrent.length - 1];
-const latestAvailableMonth = availableMonths[availableMonths.length - 1];
-const latestAvailableYear = availableYears[availableYears.length - 1];
+const latestPastMonth = monthsUpToCurrent.length > 0
+  ? monthsUpToCurrent[monthsUpToCurrent.length - 1]
+  : null;
+const latestPastYear = yearsUpToCurrent.length > 0
+  ? yearsUpToCurrent[yearsUpToCurrent.length - 1]
+  : null;
+const latestAvailableMonth = availableMonths.length > 0
+  ? availableMonths[availableMonths.length - 1]
+  : null;
+const latestAvailableYear = availableYears.length > 0
+  ? availableYears[availableYears.length - 1]
+  : null;
 const initialMonth = availableMonths.includes(currentMonth)
   ? currentMonth
   : (latestPastMonth || latestAvailableMonth || currentMonth);
