@@ -31,6 +31,7 @@ export default function ExpenseCard({ expense, onDelete, onEdit }) {
   };
 
   const cat = getCategoryById(expense.category);
+  const hasAttachments = expense.billCopy || expense.paymentCopy;
 
   return (
     <div className="relative overflow-hidden rounded-xl mb-2">
@@ -53,24 +54,35 @@ export default function ExpenseCard({ expense, onDelete, onEdit }) {
         onClick={() => swipeX === 0 && onEdit && onEdit(expense)}
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
             <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0"
               style={{ backgroundColor: cat.color + '20' }}
             >
               {cat.icon}
             </div>
-            <div>
+            <div className="flex-1 min-w-0">
               <p className="font-medium text-gray-900 dark:text-white text-sm">{cat.label}</p>
+              {expense.vendor && (
+                <p className="text-xs text-indigo-500 dark:text-indigo-400 truncate">{expense.vendor}</p>
+              )}
               {expense.note && (
-                <p className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-[160px]">{expense.note}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{expense.note}</p>
               )}
               <p className="text-xs text-gray-400 dark:text-gray-500">{formatDate(expense.date)}</p>
             </div>
           </div>
-          <span className="font-bold text-gray-900 dark:text-white">
-            {formatCurrency(expense.amount)}
-          </span>
+          <div className="flex flex-col items-end gap-1 flex-shrink-0 ml-2">
+            <span className="font-bold text-gray-900 dark:text-white">
+              {formatCurrency(expense.amount)}
+            </span>
+            {hasAttachments && (
+              <div className="flex gap-1">
+                {expense.billCopy && <span className="text-xs" title="Bill copy">📄</span>}
+                {expense.paymentCopy && <span className="text-xs" title="Payment copy">✅</span>}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -71,6 +71,7 @@ export default function ExpenseModal({ isOpen, onClose, editExpense }) {
 
   useEffect(() => {
     if (editExpense) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         amount: String(editExpense.amount),
         category: editExpense.category,
