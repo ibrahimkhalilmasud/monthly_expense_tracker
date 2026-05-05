@@ -144,7 +144,7 @@ export default function Expenses() {
                           📄
                         </a>
                       ) : (
-                        <span className="text-gray-200 dark:text-gray-700 text-base">📄</span>
+                        <span className="text-gray-300 dark:text-gray-700 text-base" aria-label="No bill copy attached">–</span>
                       )}
                       {e.paymentCopy ? (
                         <a
@@ -158,7 +158,7 @@ export default function Expenses() {
                           ✅
                         </a>
                       ) : (
-                        <span className="text-gray-200 dark:text-gray-700 text-base">☐</span>
+                        <span className="text-gray-300 dark:text-gray-700 text-base" aria-label="No payment copy attached">–</span>
                       )}
                     </div>
                   </td>
@@ -193,7 +193,7 @@ export default function Expenses() {
         +
       </button>
 
-      <ExpenseModal isOpen={modalOpen} onClose={handleCloseModal} editExpense={editExpense} />
+      <ExpenseModal key={editExpense?.id || (modalOpen ? 'new' : 'closed')} isOpen={modalOpen} onClose={handleCloseModal} editExpense={editExpense} />
     </div>
   );
 }

@@ -38,7 +38,9 @@ export default function Analytics() {
     .map((c) => ({ name: c.label, amount: breakdown[c.id], color: c.color }));
   const mPieData = mBarData.map((d) => ({ ...d, value: d.amount }));
 
-  // ── Yearly data ──────────────────────────────────────────────────────────────
+  // Scale factor: each month's bar width is proportional to its share * this
+  // multiplier, capped at 100%. A value of 3 spreads the bars visually.
+  const MONTH_BAR_SCALE = 3;
   const availableYears = getAvailableYears();
   const yMonthlyData = getYearlyMonthlyData(selectedYear).map((d) => ({
     ...d,
@@ -257,7 +259,7 @@ export default function Analytics() {
                         <div className="w-24 bg-gray-100 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                           <div
                             className="h-full bg-indigo-500 rounded-full"
-                            style={{ width: `${yTotal > 0 ? Math.min((d.amount / yTotal) * 100 * 3, 100) : 0}%` }}
+                            style={{ width: `${yTotal > 0 ? Math.min((d.amount / yTotal) * 100 * MONTH_BAR_SCALE, 100) : 0}%` }}
                           />
                         </div>
                         <span className="text-sm font-semibold text-gray-900 dark:text-white w-28 text-right">

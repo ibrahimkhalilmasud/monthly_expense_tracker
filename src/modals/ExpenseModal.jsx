@@ -1,20 +1,35 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { CATEGORIES } from '../utils/categories';
 import useExpenseStore from '../store/useExpenseStore';
 
 const MAX_FILE_BYTES = 1.5 * 1024 * 1024; // 1.5 MB per attachment
 
-const defaultForm = {
-  amount: '',
-  category: 'office_rental',
-  date: new Date().toISOString().split('T')[0],
-  note: '',
-  vendor: '',
-  billCopy: null,      // base64 data URL
-  billCopyName: '',
-  paymentCopy: null,   // base64 data URL
-  paymentCopyName: '',
-};
+function makeForm(editExpense) {
+  if (editExpense) {
+    return {
+      amount: String(editExpense.amount),
+      category: editExpense.category,
+      date: editExpense.date,
+      note: editExpense.note || '',
+      vendor: editExpense.vendor || '',
+      billCopy: editExpense.billCopy || null,
+      billCopyName: editExpense.billCopyName || '',
+      paymentCopy: editExpense.paymentCopy || null,
+      paymentCopyName: editExpense.paymentCopyName || '',
+    };
+  }
+  return {
+    amount: '',
+    category: 'office_rental',
+    date: new Date().toISOString().split('T')[0],
+    note: '',
+    vendor: '',
+    billCopy: null,
+    billCopyName: '',
+    paymentCopy: null,
+    paymentCopyName: '',
+  };
+}
 
 function readFileAsDataURL(file) {
   return new Promise((resolve, reject) => {
@@ -61,33 +76,18 @@ function AttachmentButton({ label, icon, value, name, onChange, inputRef }) {
   );
 }
 
+/**
+ * Rendered with a key prop from the parent (Dashboard/Expenses) so that it
+ * fully remounts — and re-initialises form state — whenever editExpense changes
+ * or the modal is opened/closed. This avoids setState-in-effect.
+ */
 export default function ExpenseModal({ isOpen, onClose, editExpense }) {
-  const [form, setForm] = useState(defaultForm);
+  const [form, setForm] = useState(() => makeForm(editExpense));
   const [error, setError] = useState('');
   const billRef = useRef(null);
   const payRef = useRef(null);
   const addExpense = useExpenseStore((s) => s.addExpense);
   const updateExpense = useExpenseStore((s) => s.updateExpense);
-
-  useEffect(() => {
-    if (editExpense) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setForm({
-        amount: String(editExpense.amount),
-        category: editExpense.category,
-        date: editExpense.date,
-        note: editExpense.note || '',
-        vendor: editExpense.vendor || '',
-        billCopy: editExpense.billCopy || null,
-        billCopyName: editExpense.billCopyName || '',
-        paymentCopy: editExpense.paymentCopy || null,
-        paymentCopyName: editExpense.paymentCopyName || '',
-      });
-    } else {
-      setForm(defaultForm);
-    }
-    setError('');
-  }, [editExpense, isOpen]);
 
   if (!isOpen) return null;
 

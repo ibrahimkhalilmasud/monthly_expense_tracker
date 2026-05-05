@@ -184,7 +184,7 @@ export default function Dashboard() {
         +
       </button>
 
-      <ExpenseModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      <ExpenseModal key={modalOpen ? 'open' : 'closed'} isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 }
