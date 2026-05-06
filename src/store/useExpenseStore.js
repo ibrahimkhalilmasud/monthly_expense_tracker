@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { storageService } from '../services/storage';
-import { getCurrentMonth } from '../utils/formatters';
+import { getCurrentMonth, YEAR_MONTH_LENGTH } from '../utils/formatters';
 import { SAMPLE_EXPENSES, SAMPLE_BUDGET } from '../utils/sampleData';
 
 let idCounter = Date.now();
@@ -27,12 +27,42 @@ function initExpenses() {
   return stored;
 }
 
+const initialExpenses = initExpenses();
+const currentMonth = getCurrentMonth();
+const currentYear = String(new Date().getFullYear());
+const availableMonths = [
+  ...new Set(initialExpenses.map((e) => e.date?.substring(0, YEAR_MONTH_LENGTH)).filter(Boolean)),
+].sort();
+const availableYears = [
+  ...new Set(initialExpenses.map((e) => e.date?.split('-')[0]).filter(Boolean)),
+].sort();
+const monthsUpToCurrent = availableMonths.filter((month) => month <= currentMonth);
+const yearsUpToCurrent = availableYears.filter((year) => year <= currentYear);
+const latestPastMonth = monthsUpToCurrent.length > 0
+  ? monthsUpToCurrent[monthsUpToCurrent.length - 1]
+  : null;
+const latestPastYear = yearsUpToCurrent.length > 0
+  ? yearsUpToCurrent[yearsUpToCurrent.length - 1]
+  : null;
+const latestAvailableMonth = availableMonths.length > 0
+  ? availableMonths[availableMonths.length - 1]
+  : null;
+const latestAvailableYear = availableYears.length > 0
+  ? availableYears[availableYears.length - 1]
+  : null;
+const initialMonth = availableMonths.includes(currentMonth)
+  ? currentMonth
+  : (latestPastMonth || latestAvailableMonth || currentMonth);
+const initialYear = availableYears.includes(currentYear)
+  ? currentYear
+  : (latestPastYear || latestAvailableYear || currentYear);
+
 const useExpenseStore = create((set, get) => ({
-  expenses: initExpenses(),
+  expenses: initialExpenses,
   budget: storageService.getBudget(),
   settings: storageService.getSettings(),
-  selectedMonth: getCurrentMonth(),
-  selectedYear: String(new Date().getFullYear()),
+  selectedMonth: initialMonth,
+  selectedYear: initialYear,
 
   setSelectedMonth: (month) => set({ selectedMonth: month }),
   setSelectedYear: (year) => set({ selectedYear: year }),
